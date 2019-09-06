@@ -1,24 +1,21 @@
-import json
+import boto3
+   
+dynamodb = boto3.resource('dynamodb')
+table    = dynamodb.Table('question_table')
+   
+def get_question(id):
+    response = table.get_item(
+            Key={
+                 'question_id': id
+            }
+        )
+    return response['Item']
 
+
+def get_questions():
+    response = table.scan()
+    return response['Items']
+           
 
 def hello(event, context):
-    body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "input": event
-    }
-
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
-
-    return response
-
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
+    return get_questions() if event['question_id'] == '' else get_question(event['question_id'])
